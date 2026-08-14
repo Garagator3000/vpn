@@ -1,0 +1,76 @@
+---
+- name: Установка зависимостей
+  ansible.builtin.package:
+    name:
+      - tar
+      - wget
+      - libcap2-bin
+    state: present
+
+- name: Создание системной группы gost
+  ansible.builtin.group:
+    name: gost
+    system: true
+    state: present
+
+- name: Создание системного пользователя
+  ansible.builtin.user:
+    name: gost
+    group: gost
+    system: true
+    shell: /usr/sbin/nologin
+    create_home: false
+    state: present
+
+- name: Создание рабочей директории /opt/gost
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: gost
+    group: gost
+    mode: '0750'
+  loop:
+    - /opt/gost
+    - /opt/gost/bin
+    - /opt/gost/config
+
+- name: Скачивание и распаковка gost в /opt/gost/bin
+  ansible.builtin.unarchive:
+    src: "https://github.com/go-gost/gost/releases/download/v{{ gost_version }}/gost_{{ gost_version }}_linux_amd64.tar.gz"
+    dest: /opt/gost/bin/
+    remote_src: true
+    include: ["gost"]
+    owner: gost
+    group: gost
+    mode: '0750'
+
+- name: Разрешение пользователю gost биндить порт 443 (setcap)
+  community.general.capabilities:
+    path: /opt/gost/bin/gost
+    capability: cap_net_bind_service+ep
+    state: present
+
+- name: Генерация конфигурационного файла из шаблона
+  ansible.builtin.template:
+    src: gost.yaml.j2
+    dest: /opt/gost/config/gost.yaml
+    owner: gost
+    group: gost
+    mode: '0640'
+  notify: Restart gost
+
+- name: Генерация systemd-сервиса из шаблона
+  ansible.builtin.template:
+    src: gost.service.j2
+    dest: /etc/systemd/system/gost.service
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart gost
+
+- name: Активация и запуск сервиса GOST
+  ansible.builtin.systemd:
+    name: gost
+    daemon_reload: yes
+    state: started
+    enabled: yes

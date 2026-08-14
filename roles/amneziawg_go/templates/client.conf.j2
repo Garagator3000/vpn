@@ -1,0 +1,19 @@
+[Interface]
+PrivateKey = {{ item.private_key }}
+Address = {{ item.address }}/24
+DNS = 1.1.1.1
+Jc = {{ awg_params.jc }}
+Jmin = {{ awg_params.jmin }}
+Jmax = {{ awg_params.jmax }}
+S1 = {{ awg_params.s1 }}
+S2 = {{ awg_params.s2 }}
+H1 = {{ awg_params.h1 }}
+H2 = {{ awg_params.h2 }}
+H3 = {{ awg_params.h3 }}
+H4 = {{ awg_params.h4 }}
+
+[Peer]
+PublicKey = {{ server_public_key }}
+Endpoint = {{ ansible_host }}:{{ amneziawg_go_listen_port }}
+AllowedIPs = 0.0.0.0/0
+PersistentKeepalive = 25

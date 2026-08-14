@@ -1,0 +1,13 @@
+[Unit]
+Description=AmneziaWG userspace (Go) implementation — interface {{ amneziawg_go_interface }}
+After=network.target
+
+[Service]
+Type=simple
+Environment=LOG_LEVEL=info
+ExecStart=/opt/amneziawg-go/bin/amneziawg-go -f {{ amneziawg_go_interface }}
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

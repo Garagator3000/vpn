@@ -1,0 +1,28 @@
+---
+- name: Создание директории исходников amneziawg-tools
+  ansible.builtin.file:
+    path: /opt/amneziawg-tools/src
+    state: directory
+    mode: '0755'
+
+- name: Клонирование amneziawg-tools {{ amneziawg_tools_version }}
+  ansible.builtin.git:
+    repo: https://github.com/amnezia-vpn/amneziawg-tools.git
+    dest: /opt/amneziawg-tools/src
+    version: "{{ amneziawg_tools_version }}"
+    force: true
+  register: amneziawg_tools_checkout
+
+- name: Сборка awg/awg-quick (make)
+  ansible.builtin.command: make
+  args:
+    chdir: /opt/amneziawg-tools/src/src
+  changed_when: amneziawg_tools_checkout.changed
+
+- name: Установка awg/awg-quick в систему
+  ansible.builtin.command: make install
+  args:
+    chdir: /opt/amneziawg-tools/src/src
+  environment:
+    WITH_SYSTEMDUNITS: "no"
+  changed_when: amneziawg_tools_checkout.changed

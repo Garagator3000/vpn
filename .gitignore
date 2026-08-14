@@ -1,0 +1,7 @@
+.idea
+.vscode
+ansible.cfg
+CLAUDE.md
+SESSION_STATE.md
+configs/
+inventory.yml

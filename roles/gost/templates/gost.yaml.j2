@@ -1,0 +1,7 @@
+services:
+  - name: ssh-mask
+    addr: ":{{ gost_port }}"
+    handler:
+      type: socks5
+    listener:
+      type: wss

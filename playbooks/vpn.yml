@@ -1,0 +1,33 @@
+---
+- name: Конфигурация VPN сервера
+  hosts: amster-1
+  become: true
+  gather_facts: true
+
+  vars:
+    gost_version: "3.0.0-rc10"
+    gost_port: 443
+    ssh_local_port: 22
+    go_version: "1.26.6"
+    go_checksum: "708effb774be8237570d0add163225abbdfaf4fca28b2611df167beba4feef89"
+    amneziawg_go_version: "3.0.3"
+    amneziawg_go_interface: "wg0"
+    amneziawg_go_listen_port: 443
+    amneziawg_tools_version: "v3.0.20260805"
+    amneziawg_server_address: "10.20.0.1"
+    amneziawg_clients:
+      - GaragePC
+      - HomeTV
+      - AlinaIPhone
+      - AlinaIPad
+      - client1
+
+  roles:
+    - role: base
+      tags: base
+
+    - role: gost
+      tags: gost
+
+    - role: amneziawg_go
+      tags: amneziawg

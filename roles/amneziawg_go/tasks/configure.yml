@@ -1,0 +1,16 @@
+---
+- name: Генерация systemd unit amneziawg-go
+  ansible.builtin.template:
+    src: amneziawg-go.service.j2
+    dest: /etc/systemd/system/amneziawg-go.service
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart amneziawg-go
+
+- name: Активация и запуск amneziawg-go
+  ansible.builtin.systemd:
+    name: amneziawg-go
+    daemon_reload: true
+    state: started
+    enabled: true

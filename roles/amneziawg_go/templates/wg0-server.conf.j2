@@ -1,0 +1,19 @@
+[Interface]
+ListenPort = {{ amneziawg_go_listen_port }}
+PrivateKey = {{ server_private_key }}
+Jc = {{ awg_params.jc }}
+Jmin = {{ awg_params.jmin }}
+Jmax = {{ awg_params.jmax }}
+S1 = {{ awg_params.s1 }}
+S2 = {{ awg_params.s2 }}
+H1 = {{ awg_params.h1 }}
+H2 = {{ awg_params.h2 }}
+H3 = {{ awg_params.h3 }}
+H4 = {{ awg_params.h4 }}
+
+{% for client in awg_clients %}
+[Peer]
+# {{ client.name }}
+PublicKey = {{ client.public_key }}
+AllowedIPs = {{ client.address }}/32
+{% endfor %}

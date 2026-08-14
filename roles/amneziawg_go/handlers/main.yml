@@ -1,0 +1,12 @@
+---
+- name: Restart amneziawg-go
+  ansible.builtin.systemd:
+    name: amneziawg-go
+    state: restarted
+
+- name: Apply amneziawg config
+  ansible.builtin.command: "awg setconf {{ amneziawg_go_interface }} /opt/amneziawg-tools/keys/wg0.conf"
+
+- name: Reload ufw
+  community.general.ufw:
+    state: reloaded

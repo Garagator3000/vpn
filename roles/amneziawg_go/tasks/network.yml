@@ -1,0 +1,27 @@
+---
+- name: Включение IPv4 forwarding
+  ansible.posix.sysctl:
+    name: net.ipv4.ip_forward
+    value: '1'
+    sysctl_set: true
+    state: present
+    reload: true
+
+- name: Разрешение форвардинга по умолчанию в ufw
+  ansible.builtin.lineinfile:
+    path: /etc/default/ufw
+    regexp: '^DEFAULT_FORWARD_POLICY='
+    line: 'DEFAULT_FORWARD_POLICY="ACCEPT"'
+  notify: Reload ufw
+
+- name: NAT masquerade для подсети amneziawg в /etc/ufw/before.rules
+  ansible.builtin.blockinfile:
+    path: /etc/ufw/before.rules
+    marker: "# {mark} ANSIBLE MANAGED BLOCK - amneziawg NAT"
+    insertbefore: "^\\*filter"
+    block: |
+      *nat
+      :POSTROUTING ACCEPT [0:0]
+      -A POSTROUTING -s {{ amneziawg_server_address }}/24 -o {{ ansible_default_ipv4.interface }} -j MASQUERADE
+      COMMIT
+  notify: Reload ufw

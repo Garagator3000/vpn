@@ -1,0 +1,8 @@
+---
+- ansible.builtin.include_tasks: golang.yml
+- ansible.builtin.include_tasks: build.yml
+- ansible.builtin.include_tasks: configure.yml
+- ansible.builtin.include_tasks: tools.yml
+- ansible.builtin.include_tasks: network.yml
+- ansible.builtin.include_tasks: secrets.yml
+- ansible.builtin.include_tasks: interface.yml

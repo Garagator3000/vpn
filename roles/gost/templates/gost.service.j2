@@ -1,0 +1,21 @@
+[Unit]
+Description=GO Simple Tunnel v3 Service (Non-Root)
+After=network.target
+
+[Service]
+Type=simple
+User=gost
+Group=gost
+WorkingDirectory=/opt/gost
+ExecStart=/opt/gost/bin/gost -C /opt/gost/config/gost.yaml
+Restart=always
+RestartSec=5
+
+# Защита на уровне systemd (опционально, но рекомендуется для non-root)
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/gost
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
