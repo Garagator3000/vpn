@@ -26,6 +26,9 @@
     - role: base
       tags: base
 
+    - role: ssh_hardening
+      tags: ssh_hardening
+
     - role: gost
       tags: gost
 
