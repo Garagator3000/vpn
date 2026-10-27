@@ -1,0 +1,51 @@
+---
+- name: Поиск публичных ключей пользователей
+  ansible.builtin.set_fact:
+    users_keys: "{{ query('ansible.builtin.fileglob', playbook_dir ~ '/../ssh_keys/*.pub') | map('basename') | map('regex_replace', '\\.pub$', '') | list }}"
+
+- name: Проверка наличия ключей
+  ansible.builtin.assert:
+    that: users_keys | length > 0
+    fail_msg: "В ssh_keys/ нет ни одного *.pub"
+
+# на чистом образе каталога нет, apt не может создать в нём lock
+- name: Каталог списков apt
+  ansible.builtin.file:
+    path: /var/lib/apt/lists
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Установка sudo
+  ansible.builtin.apt:
+    name: sudo
+    state: present
+    update_cache: true
+
+- name: Создание пользователей
+  ansible.builtin.user:
+    name: "{{ item }}"
+    shell: /bin/bash
+    create_home: true
+    password_lock: true
+    state: present
+  loop: "{{ users_keys }}"
+
+- name: Установка SSH-ключей
+  ansible.posix.authorized_key:
+    user: "{{ item }}"
+    key: "{{ lookup('ansible.builtin.file', playbook_dir ~ '/../ssh_keys/' ~ item ~ '.pub') }}"
+    exclusive: true
+    state: present
+  loop: "{{ users_keys }}"
+
+- name: Sudo без пароля
+  ansible.builtin.copy:
+    dest: "/etc/sudoers.d/90-{{ item }}"
+    content: "{{ item }} ALL=(ALL) NOPASSWD:ALL\n"
+    owner: root
+    group: root
+    mode: "0440"
+    validate: visudo -cf %s
+  loop: "{{ users_keys if users_sudo | bool else [] }}"

@@ -1,0 +1,13 @@
+---
+- name: Создание nonroot пользователей
+  hosts: all
+  become: true
+  gather_facts: false
+
+  vars:
+    # пользователи берутся из ssh_keys/<name>.pub, имя файла = имя пользователя
+    users_sudo: true
+
+  roles:
+    - role: users
+      tags: users

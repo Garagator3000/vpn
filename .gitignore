@@ -5,3 +5,4 @@ CLAUDE.md
 SESSION_STATE.md
 configs/
 inventory.yml
+ssh_keys/*.pub
