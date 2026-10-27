@@ -14,3 +14,19 @@
     daemon_reload: true
     state: started
     enabled: true
+
+- name: Генерация systemd unit настройки интерфейса amneziawg-go
+  ansible.builtin.template:
+    src: amneziawg-go-iface.service.j2
+    dest: /etc/systemd/system/amneziawg-go-iface.service
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart amneziawg-go
+
+# запускается в interface.yml, когда уже есть конфиг интерфейса
+- name: Включение unit настройки интерфейса
+  ansible.builtin.systemd:
+    name: amneziawg-go-iface
+    daemon_reload: true
+    enabled: true

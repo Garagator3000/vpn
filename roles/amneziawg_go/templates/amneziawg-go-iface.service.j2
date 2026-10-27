@@ -1,0 +1,16 @@
+[Unit]
+Description=AmneziaWG интерфейс {{ amneziawg_go_interface }}: конфиг, адрес, link up
+Requires=amneziawg-go.service
+After=amneziawg-go.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+# TUN создаётся процессом amneziawg-go асинхронно
+ExecStartPre=/bin/sh -c 'for i in $(seq 1 50); do ip link show {{ amneziawg_go_interface }} >/dev/null 2>&1 && exit 0; sleep 0.1; done; exit 1'
+ExecStart=/usr/bin/awg setconf {{ amneziawg_go_interface }} /opt/amneziawg-tools/keys/{{ amneziawg_go_interface }}.conf
+ExecStart=/usr/bin/ip address replace {{ amneziawg_server_address }}/24 dev {{ amneziawg_go_interface }}
+ExecStart=/usr/bin/ip link set up dev {{ amneziawg_go_interface }}
+
+[Install]
+WantedBy=multi-user.target

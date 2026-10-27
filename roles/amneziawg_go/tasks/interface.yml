@@ -7,17 +7,10 @@
     mode: '0600'
   notify: Apply amneziawg config
 
-- name: Применение конфигурации на wg0 немедленно (для последующих задач этого прогона)
-  ansible.builtin.command: "awg setconf {{ amneziawg_go_interface }} /opt/amneziawg-tools/keys/wg0.conf"
-  changed_when: false
-
-- name: Назначение IP-адреса на wg0
-  ansible.builtin.command: "ip address replace {{ amneziawg_server_address }}/24 dev {{ amneziawg_go_interface }}"
-  changed_when: false
-
-- name: Поднятие интерфейса wg0
-  ansible.builtin.command: "ip link set up dev {{ amneziawg_go_interface }}"
-  changed_when: false
+- name: Применение конфигурации, адреса и link up для wg0
+  ansible.builtin.systemd:
+    name: amneziawg-go-iface
+    state: started
 
 - name: Рендер клиентских конфигов по кодовым именам (хранятся только на VPS)
   ansible.builtin.template:
